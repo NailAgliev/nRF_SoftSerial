@@ -2,11 +2,14 @@
 #define SOFTSERIAL_H__
 
 
-//#include <stdbool.h>
-//#include <stdint.h>
-//#include "nrf.h"
-//#include "nrf_drv_timer.h"
-//#include "bsp.h"
-//#include "app_error.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "nrf.h"
+#include "nrf_drv_timer.h"
+#include "bsp.h"
+#include "app_error.h"
+
+void timer_init();
+
 
 #endif
