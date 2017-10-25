@@ -50,10 +50,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "nrf.h"
-#include "nrf_drv_timer.h"
-#include "bsp.h"
 #include "app_error.h"
-
 #include "softserial.h"
 
 
@@ -67,6 +64,8 @@ int main(void)
 
     //Configure TIMER_LED for generating simple light effect - leds on board will invert his state one after the other.
 		timer_init();
+		rx_init();
+		SEGGER_RTT_printf(0, "Helo World\n\r");
     while (1)
     {
         __WFI();
