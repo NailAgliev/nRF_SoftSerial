@@ -12,4 +12,11 @@
 void timer_init();
 
 
+#define BR 9600
+
+#define TIMER_FREQ 								16000000
+#define BAUDRATE_TO_TICKS(BR)   				\
+					TIMER_FREQ/(BR*2)
+					
+
 #endif

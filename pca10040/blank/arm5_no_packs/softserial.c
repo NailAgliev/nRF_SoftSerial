@@ -39,7 +39,7 @@ void timer_init(void)
 		
 
 		nrf_drv_timer_extended_compare(
-         &UART_TIMER, NRF_TIMER_CC_CHANNEL0, 1667, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);
+         &UART_TIMER, NRF_TIMER_CC_CHANNEL0, BAUDRATE_TO_TICKS(BR), NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);
 		
 		
 		    nrf_drv_timer_enable(&UART_TIMER);
