@@ -69,7 +69,7 @@ void timer_led_event_handler(nrf_timer_event_t event_type, void* p_context)
     switch (event_type)
     {
         case NRF_TIMER_EVENT_COMPARE0:
-            bsp_board_led_invert(led_to_invert);
+            nrf_gpio_pin_toggle(17);
             break;
 
         default:
