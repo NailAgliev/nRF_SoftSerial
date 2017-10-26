@@ -7,11 +7,21 @@ uint8_t index = 0;
 uint8_t rx_char = 0;
 uint8_t rx_data[20];
 uint8_t half_uart_bit_counter = 0;
-uint8_t rx_char_reverse = 0;
+uint8_t res = 0;
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
 uint32_t err_code = NRF_SUCCESS;
 
+void inv (void)
+{
+	uint8_t t= 0;
+	while (rx_char != 0)
+	{
+		t= t*2 + rx_char % 2;
+		rx_char/=2;
+	}
+	rx_char=t;
+}
 
 void rx_read()
 {
@@ -24,22 +34,9 @@ void rx_read()
 					SEGGER_RTT_printf(0, "%x \n\r", rx_char);
 					rx_data[index] = rx_char;
 					index++;
-				
-				
-					for(uint8_t counter = 8; counter > 0; counter--)
-						{
-							
-							uint8_t rx_char_mask = 0;
-							if((rx_char & (rx_char_mask 1<< 8)) == 1) // else == 0
-							{
-								rx_char_reverse++;
-							}
-							//SEGGER_RTT_printf(0, "index = %d, bit = %d \n\r", counter, rx_char%2);
-							rx_char_reverse<<1;
-							
-						}
-				
-						SEGGER_RTT_printf(0, "%x \n\r", rx_char_reverse);
+					inv ();
+					SEGGER_RTT_printf(0, "%x \n\r", rx_char);
+					rx_char = 0;
 						
 				  if(rx_char == 0xD) //конец посылки
 				  {
