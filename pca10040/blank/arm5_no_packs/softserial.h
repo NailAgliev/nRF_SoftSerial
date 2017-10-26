@@ -20,11 +20,17 @@
 #define BAUDRATE_TO_TICKS(BR)   				\
 					TIMER_FREQ/(BR*2)
 					
+#define TIMER_OFF 0
+#define TIMER_ON_BY_RX 1
+#define TIMER_ON_BY_TX 2
+#define TIMER_ON_TXRX 3
+
 
 
 void timer_init();
 void rx_read();
-
+void soft_uart_pins_init();
+void tx_put();
 
 
 #endif

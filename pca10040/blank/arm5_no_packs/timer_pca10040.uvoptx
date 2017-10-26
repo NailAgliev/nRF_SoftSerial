@@ -150,9 +150,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>52</LineNumber>
+          <LineNumber>36</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>6272</Address>
+          <Address>6906</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -161,14 +161,14 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\softserial.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nrf52832_xxaa\softserial.c\52</Expression>
+          <Expression>\\nrf52832_xxaa\softserial.c\36</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>31</LineNumber>
+          <LineNumber>19</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>6178</Address>
+          <Address>7022</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -177,71 +177,39 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\softserial.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nrf52832_xxaa\softserial.c\31</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>33</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\softserial.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>56</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\softserial.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\nrf52832_xxaa\softserial.c\19</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rx_char,0x10</ItemText>
+          <ItemText>tx_half_bit_counter</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>counter</ItemText>
+          <ItemText>tx_char</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rx_char_reverse</ItemText>
+          <ItemText>timer_flag</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>rx_char_mask</ItemText>
+          <ItemText>tx_counter</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>res</ItemText>
+          <ItemText>1 &lt;&lt; tx_counter</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>t</ItemText>
+          <ItemText>tx_char &amp; ( 1 &lt;&lt; tx_counter)</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -250,7 +218,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -290,6 +258,10 @@
         <Entry>
           <Name>System Viewer\GPIOTE</Name>
           <WinId>35905</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\P0</Name>
+          <WinId>35903</WinId>
         </Entry>
         <Entry>
           <Name>System Viewer\TIMER0</Name>

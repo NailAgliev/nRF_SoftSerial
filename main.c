@@ -64,8 +64,11 @@ int main(void)
 
     //Configure TIMER_LED for generating simple light effect - leds on board will invert his state one after the other.
 		timer_init();
-		rx_init();
-		SEGGER_RTT_printf(0, "Helo World\n\r");
+		soft_uart_pins_init();
+		SEGGER_RTT_printf(0, "start send byte \n\r");
+		tx_put();
+		
+		
     while (1)
     {
         __WFI();
