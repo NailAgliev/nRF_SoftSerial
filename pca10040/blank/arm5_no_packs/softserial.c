@@ -7,37 +7,39 @@ uint8_t index = 0;
 uint8_t rx_char = 0;
 uint8_t rx_data[20];
 uint8_t half_uart_bit_counter = 0;
-uint8_t res = 0;
+uint8_t counter = 0;
+uint8_t test_rx_line = 0;
+uint8_t bit_push = 0;
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
 uint32_t err_code = NRF_SUCCESS;
 
-void inv (void)
-{
-	uint8_t t= 0;
-	while (rx_char != 0)
-	{
-		t= t*2 + rx_char % 2;
-		rx_char/=2;
-	}
-	rx_char=t;
-}
+//void inv (void)
+//{
+//	uint8_t t= 0;
+//	while (rx_char != 0)
+//	{
+//		t= t*2 + rx_char % 2;
+//		rx_char/=2;
+//	}
+//	rx_char=t;
+//}
 
 void rx_read()
 {
-	if(half_uart_bit_counter >= 17)   // получили 8 бит данных
+	if(half_uart_bit_counter > 17)   // получили 8 бит данных
 			{
 				
 					half_uart_bit_counter = 0;
 					nrf_drv_gpiote_in_event_enable(SOFT_RX_PIN, true);// начинаем ждать стартовый бит
 					nrf_drv_timer_disable(&UART_TIMER); // выключаем таймер
-					SEGGER_RTT_printf(0, "%x \n\r", rx_char);
+					//SEGGER_RTT_printf(0, "%x \n\r", rx_char);
 					rx_data[index] = rx_char;
 					index++;
-					inv ();
-					SEGGER_RTT_printf(0, "%x \n\r", rx_char);
+					//SEGGER_RTT_printf(0, "%x \n\r", rx_char);
 					rx_char = 0;
-						
+					counter = 0;
+				bit_push = 0;
 				  if(rx_char == 0xD) //конец посылки
 				  {
 						
@@ -47,14 +49,31 @@ void rx_read()
 				  }
 						
 			}
-	if((half_uart_bit_counter >= 3) && ((half_uart_bit_counter % 2) == 1))
+	if((half_uart_bit_counter >= 3) && ((half_uart_bit_counter % 2) == 1)) // заходим по нечетным прерываниям (8 бит данных)
 	{
 		 	//	SEGGER_RTT_printf(0, "%d\n\r", half_uart_bit_counter);
+		
 	   if(nrf_drv_gpiote_in_is_set(SOFT_RX_PIN))
 		 {
-			 rx_char++;
+			 rx_char = rx_char | (1 << counter);
+//			 test_rx_line = 1;
+//			 bit_push |= (1 << counter);
+//			  			 
+//		 }
+//		 else 
+//		 {
+//				test_rx_line = 0;
+//		 }
+//		 
+//		 
+//		 SEGGER_RTT_printf(0, "counter = %x, rx_line = %x, bit_push = %x\n\r",  counter, test_rx_line, bit_push);
+//		 
+//		 
+//		 
 		 }
-			rx_char <<= 1;		
+		 SEGGER_RTT_printf(0, "%x   %d \n\r", rx_char, counter);
+			counter++;
+		 
 			
 	}
 		
