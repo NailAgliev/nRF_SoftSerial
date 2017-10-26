@@ -43,20 +43,23 @@ void tx_pin_set()
 		{
 			nrf_gpio_pin_clear(SOFT_TX_PIN);
 		}
-		
 		tx_counter++;
 	}
 	if(tx_half_bit_counter >17 )
 	{
 		tx_half_bit_counter = 0;
+		if(timer_flag != TIMER_ON_TXRX)
+		{
 		nrf_drv_timer_disable(&UART_TIMER);
-		nrf_gpio_pin_set(SOFT_TX_PIN);
+		timer_flag = TIMER_OFF;
+		}
+		else
+		{
+			timer_flag = TIMER_ON_BY_RX;
+		}
 		
-		timer_flag = 0;
+		nrf_gpio_pin_set(SOFT_TX_PIN);
 	}	
-	
-	
-	
 }
 
 void rx_read()
@@ -65,16 +68,28 @@ void rx_read()
 			{
 					rx_half_bit_counter = 0;
 					nrf_drv_gpiote_in_event_enable(SOFT_RX_PIN, true);// начинаем ждать стартовый бит
-					nrf_drv_timer_disable(&UART_TIMER); // выключаем таймер
+					if(timer_flag != TIMER_ON_TXRX)
+						{
+							nrf_drv_timer_disable(&UART_TIMER);
+							timer_flag = TIMER_OFF;
+						}
+					else
+						{
+							timer_flag = TIMER_ON_BY_TX;
+						}
+					//SEGGER_RTT_printf(0, "%x\n\r", rx_char);
 					rx_data[index] = rx_char;
-					index++;
-					rx_char = 0;
-					rx_counter = 0;
-					timer_flag = 0;
-				  if(rx_char == 0xD) //конец посылки
+						index++;
+						  if(rx_char == 0xA) //конец посылки
 				  {
 						index = 0;
+						//SEGGER_RTT_printf(0, "get A\n\r");
+						SEGGER_RTT_printf(0, "%s\n\r", rx_data);
 				  }
+					
+					rx_char = 0;
+					rx_counter = 0;
+				
 			}
 	if((rx_half_bit_counter >= 3) && ((rx_half_bit_counter % 2) == 1)) // заходим по нечетным прерываниям (8 бит данных)
 	{
@@ -82,7 +97,6 @@ void rx_read()
 		 {
 			 rx_char = rx_char | (1 << rx_counter); 
 		 }
-		 SEGGER_RTT_printf(0, "%x   %d \n\r", rx_char, rx_counter);
 			rx_counter++;
 	}
 }
@@ -92,13 +106,11 @@ void rx_start_bit_handler (nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t actio
 		{
 		nrf_drv_timer_enable(&UART_TIMER);
 		nrf_drv_gpiote_in_event_disable(SOFT_RX_PIN);
-		SEGGER_RTT_printf(0, "start bit interupt\n\r");
 		timer_flag = TIMER_ON_BY_RX;
 		}
 		else //если таймер запущенн то не включать таймер
 	{
 		nrf_drv_gpiote_in_event_disable(SOFT_RX_PIN);
-		SEGGER_RTT_printf(0, "flag=1 \n\r");
 		timer_flag = TIMER_ON_TXRX;
 	}
 }
@@ -144,9 +156,7 @@ void timer_uart_event_handler(nrf_timer_event_t event_type, void* p_context)
     }
 	}
 void timer_init(void)
-{
-		SEGGER_RTT_printf(0, "Timer init");
-	
+{	
 		nrf_drv_timer_config_t timer_cfg =
 		{
 	  .frequency          = (nrf_timer_frequency_t)NRF_TIMER_FREQ_16MHz,
@@ -158,11 +168,7 @@ void timer_init(void)
 
 		err_code = nrf_drv_timer_init(&UART_TIMER, &timer_cfg, timer_uart_event_handler);
 		APP_ERROR_CHECK(err_code);
-		if(err_code==NRF_SUCCESS);
-		{
-					SEGGER_RTT_printf(0, " SUCCESS \n\r");
-		}
-			
+
 		nrf_drv_timer_extended_compare(&UART_TIMER, NRF_TIMER_CC_CHANNEL0, BAUDRATE_TO_TICKS(BR), NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);    
 
 }
