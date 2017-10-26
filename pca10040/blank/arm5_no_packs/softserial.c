@@ -79,12 +79,12 @@ void rx_read()
 						}
 					//SEGGER_RTT_printf(0, "%x\n\r", rx_char);
 					rx_data[index] = rx_char;
-						index++;
+					index++;
 						  if(rx_char == 0xA) //конец посылки
 				  {
 						index = 0;
 						//SEGGER_RTT_printf(0, "get A\n\r");
-						SEGGER_RTT_printf(0, "%s\n\r", rx_data);
+						SEGGER_RTT_printf(0, "%s", rx_data);
 				  }
 					
 					rx_char = 0;
