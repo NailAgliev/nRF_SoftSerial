@@ -41,6 +41,17 @@ void SSerial_get(uint8_t * p_byte)
 	app_fifo_get(&rx_fifo, p_byte);
 }
 
+void SSerial_put_string(uint8_t * p_string)
+{
+	SEGGER_RTT_printf(0, "%s", p_string);
+	for (uint8_t c=0; c < strlen(p_string); c++)
+	{
+		SSerial_put(p_string+c);
+	}
+}
+
+
+
 uint32_t SSerial_put(uint8_t * p_tx_byte)
 {
 	err_code = app_fifo_put(&tx_fifo, *p_tx_byte); //пихаем байт в фифо
