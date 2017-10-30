@@ -7,26 +7,25 @@ uint8_t __rx_pin = 0;
 
 uint16_t timer_tics = 0;
 
-uint8_t index = 0;
-uint8_t rx_char = 0;
-uint8_t tx_char = 0;
-uint8_t rx_data[20];
+uint8_t index = 0;			// временное решение rx
+uint8_t rx_byte = 0; 	// в этот байт по битно записываются биты с пина rx
+uint8_t tx_byte = 0;	//в эту переменую записывается байт из фифо и потом он отправляется по битно по линии tx
+uint8_t rx_data[20];   // временное решение rx
 uint8_t rx_half_bit_counter = 0;
 uint8_t tx_half_bit_counter = 0;
 uint8_t rx_counter = 0;
 uint8_t tx_counter = 0;
-uint8_t timer_flag = 0;
-char tx_byte_for_send = 's';
-app_fifo_t rx_fifo;
-app_fifo_t tx_fifo;
-uint32_t remaining_bytes_to_send = 0;
+uint8_t timer_flag = 0;   // состояне флага
+char tx_byte_for_send = 's'; // временное решение rx
+app_fifo_t rx_fifo;   // создаем структуру для фифо rx
+app_fifo_t tx_fifo;		// создаем структуру для фифо tx
+uint32_t remaining_bytes_to_send = 0;    // количество байт которые предстоит отправить (сейчас не используется)
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
 uint32_t err_code = NRF_SUCCESS;
 
 void SoftSerial_init(uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size)
-{
-			
+{		
 		__tx_pin = tx_pin;
 		__rx_pin = rx_pin;
 		timer_tics = (TIMER_FREQ/(baud_rate*2));
@@ -44,12 +43,12 @@ void SSerial_get(uint8_t * p_byte)
 
 uint32_t SSerial_put(uint8_t * p_tx_byte)
 {
-	err_code = app_fifo_put(&tx_fifo, *p_tx_byte);
+	err_code = app_fifo_put(&tx_fifo, *p_tx_byte); //пихаем байт в фифо
 	if(err_code == NRF_SUCCESS)
 	{
-	if(tx_char == 0)
+	if(tx_byte == 0)
 		{
-			err_code = app_fifo_get(&tx_fifo, &tx_char);
+			err_code = app_fifo_get(&tx_fifo, &tx_byte); // пихаем из фифо в байт tx
 		if(err_code == NRF_ERROR_NOT_FOUND)
 			{
 				app_fifo_flush(&tx_fifo);
@@ -84,16 +83,16 @@ uint32_t tx_put(void)
 
 void tx_pin_set()
 {
-	if(tx_half_bit_counter >17 )
+	if(tx_half_bit_counter >17 ) // отправляем стоповый бит
 	{
 		nrf_gpio_pin_set(__tx_pin);
 	}		
-	if(tx_half_bit_counter > 19 )
+	if(tx_half_bit_counter > 19 ) 
 	{
 		tx_half_bit_counter = 0;
-		tx_char = 0;
+		tx_byte = 0;
 		tx_counter = 0;
-		err_code = app_fifo_read(&tx_fifo, NULL, &remaining_bytes_to_send);
+		err_code = app_fifo_read(&tx_fifo, NULL, &remaining_bytes_to_send); // проверяем нужно ли отправить ещё один байт и если не нужно выключаем таймер
 		if(err_code == NRF_ERROR_NOT_FOUND)
 			{
 				if(timer_flag != TIMER_ON_TXRX)
@@ -103,13 +102,13 @@ void tx_pin_set()
 					}
 				else
 					{
-						timer_flag = TIMER_ON_BY_RX;
+						timer_flag = TIMER_ON_BY_RX; 
 					}
 			}
-		else
+		else 																		//если нужно отправить ещё один байт то отправляем стартовый бит
 		{
 			remaining_bytes_to_send--;
-			app_fifo_get(&tx_fifo, &tx_char);
+			app_fifo_get(&tx_fifo, &tx_byte);
 			nrf_gpio_pin_clear(__tx_pin);
 		}
 		
@@ -117,9 +116,9 @@ void tx_pin_set()
 	
 	
 	
-	if((tx_half_bit_counter >= 2) && ((tx_half_bit_counter % 2) == 0) && (tx_half_bit_counter <17))
+	if((tx_half_bit_counter >= 2) && ((tx_half_bit_counter % 2) == 0) && (tx_half_bit_counter <17)) // отправляем байты с 0 по 8
 	{
-		if((tx_char & ( 1 << tx_counter)) > 0)
+		if((tx_byte & ( 1 << tx_counter)) > 0)
 		{	
 			nrf_gpio_pin_set(__tx_pin);
 		}
@@ -146,17 +145,17 @@ void rx_read()
 						{
 							timer_flag = TIMER_ON_BY_TX;
 						}
-					//SEGGER_RTT_printf(0, "%x\n\r", rx_char);
-					rx_data[index] = rx_char;
+					//SEGGER_RTT_printf(0, "%x\n\r", rx_byte);
+					rx_data[index] = rx_byte;
 					index++;
-						  if(rx_char == 0xA) //конец посылки
+						  if(rx_byte == 0xA) //конец посылки
 				  {
 						index = 0;
 						//SEGGER_RTT_printf(0, "get A\n\r");
 						SEGGER_RTT_printf(0, "%s", rx_data);
 				  }
 					
-					rx_char = 0;
+					rx_byte = 0;
 					rx_counter = 0;
 				
 			}
@@ -164,7 +163,7 @@ void rx_read()
 	{
 	   if(nrf_drv_gpiote_in_is_set(__rx_pin))
 		 {
-			 rx_char = rx_char | (1 << rx_counter); 
+			 rx_byte = rx_byte | (1 << rx_counter); 
 		 }
 			rx_counter++;
 	}
