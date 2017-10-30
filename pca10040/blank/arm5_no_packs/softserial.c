@@ -19,6 +19,7 @@ uint8_t timer_flag = 0;
 char tx_byte_for_send = 's';
 app_fifo_t rx_fifo;
 app_fifo_t tx_fifo;
+uint32_t remaining_bytes_to_send = 0;
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
 uint32_t err_code = NRF_SUCCESS;
@@ -41,27 +42,82 @@ void SSerial_get(uint8_t * p_byte)
 	app_fifo_get(&rx_fifo, p_byte);
 }
 
-void SSerial_put(uint8_t * p_tx_byte)
+uint32_t SSerial_put(uint8_t * p_tx_byte)
 {
-	app_fifo_put(&tx_fifo, *p_tx_byte);
+	err_code = app_fifo_put(&tx_fifo, *p_tx_byte);
+	if(err_code == NRF_SUCCESS)
+	{
+	if(tx_char == 0)
+		{
+			err_code = app_fifo_get(&tx_fifo, &tx_char);
+		if(err_code == NRF_ERROR_NOT_FOUND)
+			{
+				app_fifo_flush(&tx_fifo);
+				return NRF_SUCCESS;
+			}
+		}
+	}
+	else
+	{
+		return NRF_ERROR_NO_MEM;
+	}
+	tx_put();
+	return err_code;
 }
-void tx_put(void)
+uint32_t tx_put(void)
 {
 	if(timer_flag == TIMER_OFF)
 	{
 		nrf_gpio_pin_clear(__tx_pin);
 		timer_flag = TIMER_ON_BY_TX;
-		nrf_drv_timer_enable(&UART_TIMER);		
+		nrf_drv_timer_enable(&UART_TIMER);
+		err_code = NRF_SUCCESS;
 	}
 	else
 	{
+		nrf_gpio_pin_clear(__tx_pin);
 		timer_flag = TIMER_ON_TXRX;
+		err_code = NRF_ERROR_BUSY;
 	}
+	return err_code;
 }
 
 void tx_pin_set()
 {
-	if((tx_half_bit_counter >= 2) && ((tx_half_bit_counter % 2) == 0))
+	if(tx_half_bit_counter >17 )
+	{
+		nrf_gpio_pin_set(__tx_pin);
+	}		
+	if(tx_half_bit_counter > 19 )
+	{
+		tx_half_bit_counter = 0;
+		tx_char = 0;
+		tx_counter = 0;
+		err_code = app_fifo_read(&tx_fifo, NULL, &remaining_bytes_to_send);
+		if(err_code == NRF_ERROR_NOT_FOUND)
+			{
+				if(timer_flag != TIMER_ON_TXRX)
+					{
+						nrf_drv_timer_disable(&UART_TIMER);
+						timer_flag = TIMER_OFF;
+					}
+				else
+					{
+						timer_flag = TIMER_ON_BY_RX;
+					}
+			}
+		else
+		{
+			remaining_bytes_to_send--;
+			app_fifo_get(&tx_fifo, &tx_char);
+			nrf_gpio_pin_clear(__tx_pin);
+		}
+		
+	}
+	
+	
+	
+	if((tx_half_bit_counter >= 2) && ((tx_half_bit_counter % 2) == 0) && (tx_half_bit_counter <17))
 	{
 		if((tx_char & ( 1 << tx_counter)) > 0)
 		{	
@@ -73,21 +129,6 @@ void tx_pin_set()
 		}
 		tx_counter++;
 	}
-	if(tx_half_bit_counter >17 )
-	{
-		tx_half_bit_counter = 0;
-		if(timer_flag != TIMER_ON_TXRX)
-		{
-		nrf_drv_timer_disable(&UART_TIMER);
-		timer_flag = TIMER_OFF;
-		}
-		else
-		{
-			timer_flag = TIMER_ON_BY_RX;
-		}
-		
-		nrf_gpio_pin_set(__tx_pin);
-	}	
 }
 
 void rx_read()

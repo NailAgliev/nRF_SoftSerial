@@ -25,9 +25,9 @@
 void timer_init();
 void rx_read();
 void soft_uart_pins_init();
-void tx_put();
+uint32_t tx_put();
 void SoftSerial_init(uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size);
-void SSerial_put(uint8_t *p_tx_byte);
+uint32_t SSerial_put(uint8_t * p_tx_byte);
 void SSerial_get(uint8_t *p_byte);
 //void SSerial_tx_send_string();
 
