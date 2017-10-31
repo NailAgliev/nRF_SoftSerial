@@ -83,7 +83,7 @@ uint32_t tx_put(void)
 		nrf_drv_timer_enable(&UART_TIMER);
 		err_code = NRF_SUCCESS;
 	}
-	else
+	else if(timer_flag != TIMER_ON_BY_TX)
 	{
 		nrf_gpio_pin_clear(__tx_pin);
 		timer_flag = TIMER_ON_TXRX;
