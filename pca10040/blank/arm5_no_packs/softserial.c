@@ -7,6 +7,8 @@ uint8_t __rx_pin = 0;
 
 uint16_t timer_tics = 0;
 
+uint8_t test_string[] = "s\n\r";
+
 uint8_t index = 0;			// временное решение rx
 uint8_t rx_byte = 0; 	// в этот байт по битно записываются биты с пина rx
 uint8_t tx_byte = 0;	//в эту переменую записывается байт из фифо и потом он отправляется по битно по линии tx
@@ -89,7 +91,11 @@ uint32_t tx_put(void)
 	}
 	else if(timer_flag != TIMER_ON_BY_TX)
 	{
-		nrf_gpio_pin_clear(__tx_pin);
+		if(tx_half_bit_counter == 0)
+			{
+				nrf_gpio_pin_clear(__tx_pin);
+			}
+		
 		timer_flag = TIMER_ON_TXRX;
 		err_code = NRF_ERROR_BUSY;
 	}
@@ -98,7 +104,7 @@ uint32_t tx_put(void)
 
 void tx_pin_set()
 {
-	if(tx_half_bit_counter >17 ) // отправляем стоповый бит
+	if(tx_half_bit_counter > 17 ) // отправляем стоповый бит
 	{
 		nrf_gpio_pin_set(__tx_pin);
 	}		
@@ -147,6 +153,7 @@ void tx_pin_set()
 
 void rx_read()
 {
+	
 	if(rx_half_bit_counter > 17)   // получили 8 бит данных
 			{
 					rx_half_bit_counter = 0;
@@ -174,6 +181,11 @@ void rx_read()
 		 }
 			rx_counter++;
 	}
+if(rx_half_bit_counter == 7)
+	{
+		SSerial_put_string(test_string);
+	}
+	
 }
 void rx_start_bit_handler (nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
