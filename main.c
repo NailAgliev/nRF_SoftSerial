@@ -52,8 +52,18 @@
 #include "nrf.h"
 #include "app_error.h"
 #include "softserial.h"
+#include "app_fifo.h"
+
+uint8_t byte = 0;
 
 
+void testfunc()
+		{
+			SSerial_get(&byte);
+			SEGGER_RTT_printf(0, "%c", byte);
+		}
+
+uint8_t test_string[] = "our test string\n\r";
 /**
  * @brief Function for main application entry.
  */
@@ -61,17 +71,13 @@ int main(void)
 {
     
     //Configure all leds on board.
-
     //Configure TIMER_LED for generating simple light effect - leds on board will invert his state one after the other.
-		timer_init();
-		soft_uart_pins_init();
-		tx_put();
+		SoftSerial_init(12, 18, 9600, 32, 32, &testfunc);
+		SSerial_put_string(test_string);
 		
-		
-    while (1)
+		while(1)
     {
-        __WFI();
-    }
+		}
 }
 
 /** @} */

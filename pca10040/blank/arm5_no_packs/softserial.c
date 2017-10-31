@@ -20,12 +20,14 @@ char tx_byte_for_send = 's'; // временное решение rx
 app_fifo_t rx_fifo;   // создаем структуру для фифо rx
 app_fifo_t tx_fifo;		// создаем структуру для фифо tx
 uint32_t remaining_bytes_to_send = 0;    // количество байт которые предстоит отправить (сейчас не используется)
+uint32_t (*p_func)() = 0;
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
 uint32_t err_code = NRF_SUCCESS;
 
-void SoftSerial_init(uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size)
-{		
+void SoftSerial_init(uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, uint32_t (*testfunc)())
+{			
+		p_func = testfunc;
 		__tx_pin = tx_pin;
 		__rx_pin = rx_pin;
 		timer_tics = (TIMER_FREQ/(baud_rate*2));
@@ -36,14 +38,16 @@ void SoftSerial_init(uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t
 		app_fifo_init(&rx_fifo, rx_buffer, rx_bufer_size);
 		app_fifo_init(&tx_fifo, tx_buffer, tx_bufer_size);		
 }
-void SSerial_get(uint8_t * p_byte)
+uint32_t SSerial_get(uint8_t * p_byte)
 {
-	app_fifo_get(&rx_fifo, p_byte);
+	err_code = app_fifo_get(&rx_fifo, p_byte);
+	//SEGGER_RTT_printf(0, "%x", *p_byte);
+	return err_code;
 }
 
 void SSerial_put_string(uint8_t * p_string)
 {
-	SEGGER_RTT_printf(0, "%s", p_string);
+	//SEGGER_RTT_printf(0, "%s", p_string);
 	for (uint8_t c=0; c < strlen(p_string); c++)
 	{
 		SSerial_put(p_string+c);
@@ -156,19 +160,11 @@ void rx_read()
 						{
 							timer_flag = TIMER_ON_BY_TX;
 						}
-					//SEGGER_RTT_printf(0, "%x\n\r", rx_byte);
-					rx_data[index] = rx_byte;
-					index++;
-						  if(rx_byte == 0xA) //конец посылки
-				  {
-						index = 0;
-						//SEGGER_RTT_printf(0, "get A\n\r");
-						SEGGER_RTT_printf(0, "%s", rx_data);
-				  }
-					
-					rx_byte = 0;
 					rx_counter = 0;
-				
+					//SEGGER_RTT_printf(0, "%x", rx_byte);
+					app_fifo_put(&rx_fifo, rx_byte);
+					p_func();
+					rx_byte = 0;				
 			}
 	if((rx_half_bit_counter >= 3) && ((rx_half_bit_counter % 2) == 1)) // заходим по нечетным прерываниям (8 бит данных)
 	{
@@ -187,7 +183,7 @@ void rx_start_bit_handler (nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t actio
 		nrf_drv_gpiote_in_event_disable(__rx_pin);
 		timer_flag = TIMER_ON_BY_RX;
 		}
-		else //если таймер запущенн то не включать таймер
+		else if(timer_flag != TIMER_ON_BY_RX) //если таймер запущенн то не включать таймер
 	{
 		nrf_drv_gpiote_in_event_disable(__rx_pin);
 		timer_flag = TIMER_ON_TXRX;
