@@ -60,7 +60,8 @@ uint8_t byte = 0;
 void testfunc()
 		{
 			SSerial_get(&byte);
-			SEGGER_RTT_printf(0, "%c", byte);
+			//SEGGER_RTT_printf(0, "%c", byte);
+			SSerial_put(&byte);
 		}
 
 

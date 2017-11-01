@@ -181,10 +181,6 @@ void rx_read()
 		 }
 			rx_counter++;
 	}
-if(rx_half_bit_counter == 7)
-	{
-		SSerial_put_string(test_string);
-	}
 	
 }
 void rx_start_bit_handler (nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
