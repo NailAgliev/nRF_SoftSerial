@@ -24,6 +24,51 @@
 #define TIMER_ON_TXRX 3
 
 
+#define TEST_MACRO(name1, name2) name1##name2
+#define INDEX 0
+
+#define UART_INIT(index) CONCAT_2(tx_byte, index);
+
+typedef struct
+{
+    uint8_t CONCAT_2(tx_byte, INDEX);
+		
+} sserial_t;
+
+
+
+#define UART0_INSTANCE_INDEX 0
+#define UART1_INSTANCE_INDEX UART0_INSTANCE_INDEX
+#define UART2_INSTANCE_INDEX UART1_INSTANCE_INDEX
+#define UART3_INSTANCE_INDEX UART2_INSTANCE_INDEX
+#define UART4_INSTANCE_INDEX UART3_INSTANCE_INDEX
+#define UART5_INSTANCE_INDEX UART4_INSTANCE_INDEX
+#define UART6_INSTANCE_INDEX UART5_INSTANCE_INDEX
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void timer_init();
 void rx_read();
 void soft_uart_pins_init();

@@ -7,18 +7,14 @@ uint8_t __rx_pin = 0;
 
 uint16_t timer_tics = 0;
 
-uint8_t test_string[] = "s\n\r";
 
-uint8_t index = 0;			// временное решение rx
 uint8_t rx_byte = 0; 	// в этот байт по битно записываются биты с пина rx
 uint8_t tx_byte = 0;	//в эту переменую записывается байт из фифо и потом он отправляется по битно по линии tx
-uint8_t rx_data[20];   // временное решение rx
 uint8_t rx_half_bit_counter = 0;
 uint8_t tx_half_bit_counter = 0;
 uint8_t rx_counter = 0;
 uint8_t tx_counter = 0;
 uint8_t timer_flag = 0;   // состояне флага
-char tx_byte_for_send = 's'; // временное решение rx
 app_fifo_t rx_fifo;   // создаем структуру для фифо rx
 app_fifo_t tx_fifo;		// создаем структуру для фифо tx
 uint32_t remaining_bytes_to_send = 0;    // количество байт которые предстоит отправить (сейчас не используется)

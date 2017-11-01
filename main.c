@@ -56,6 +56,7 @@
 
 uint8_t byte = 0;
 
+static sserial_t uart;
 
 void testfunc()
 		{
