@@ -42,11 +42,19 @@ typedef struct
 	app_fifo_t tx_fifo;
 } sserial_t;
 
-#define UART_DEFALUT   	\
-}												\
-.__tx_pin = 0,		\
-.__rx_pin = 0,		\
-.timer_tics = 0,\
+#define SSERIAL_DEFALUT      \                 
+{												
+	.__tx_pin = 0,		\
+	.__rx_pin = 0,		\
+	.timer_tics = 0,	\
+	.rx_byte = 0,    \
+	.tx_byte = 0,
+	.rx_half_bit_counter = 0,  \
+	.tx_half_bit_counter = 0,  \
+	.rx_counter = 0,   \
+	.tx_counter = 0,  \
+	.rx_fifo = 0,  \
+	.tx_fifo = 0  \
 }
 
 #define UART0_INSTANCE_INDEX 0

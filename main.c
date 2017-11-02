@@ -28,24 +28,13 @@ extern sserial_t my_uart =
 
 uint8_t byte = 0;
 
-//static sserial_t uart;
-
 void testfunc()
 		{
 			SSerial_get(&my_uart, &byte);
-			//SEGGER_RTT_printf(0, "%c", byte);
 			SSerial_put(&my_uart, &byte);
 		}
-
-
-/**
- * @brief Function for main application entry.
- */
 int main(void)
 {
-    
-    //Configure all leds on board.
-    //Configure TIMER_LED for generating simple light effect - leds on board will invert his state one after the other.
 		SoftSerial_init(&my_uart, 12, 18, 9600, 64, 64, &testfunc);
 		
 		while(1)
