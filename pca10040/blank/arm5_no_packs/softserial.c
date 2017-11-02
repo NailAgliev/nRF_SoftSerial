@@ -21,34 +21,34 @@ void SoftSerial_init(sserial_t *  p_instance,	uint8_t tx_pin, uint8_t rx_pin, ui
 		p_instance->__tx_pin = tx_pin;
 		p_instance->__rx_pin = rx_pin;
 		p_instance->timer_tics = (TIMER_FREQ/(baud_rate*2));
-		timer_init();
-		soft_uart_pins_init();
+		timer_init(p_instance);
+		soft_uart_pins_init(p_instance);
 		uint8_t rx_buffer[rx_bufer_size];
 		uint8_t tx_buffer[tx_bufer_size];
-		app_fifo_init(&p_instance->p_instance->p_instance->p_instance->p_instance->rx_fifo, rx_buffer, rx_bufer_size);
+		app_fifo_init(&p_instance->rx_fifo, rx_buffer, rx_bufer_size);
 		app_fifo_init(&p_instance->tx_fifo, tx_buffer, tx_bufer_size);		
 }
-uint32_t SSerial_get(uint8_t * p_byte)
+uint32_t SSerial_get(sserial_t * p_instance, uint8_t * p_byte)
 {
-	err_code = app_fifo_get(&p_instance->p_instance->p_instance->p_instance->p_instance->rx_fifo, p_byte);
+	err_code = app_fifo_get(&p_instance->rx_fifo, p_byte);
 	//SEGGER_RTT_printf(0, "%x", *p_byte);
 	return err_code;
 }
 
-void SSerial_put_string(uint8_t * p_string)
+void SSerial_put_string(sserial_t * p_instance, uint8_t * p_string)
 {
 	//SEGGER_RTT_printf(0, "%s", p_string);
 	for (uint8_t c=0; c < (uint8_t)strlen(p_string); c++)
 	{
-		SSerial_put(p_string+c);
+		SSerial_put(p_instance, p_string+c);
 	}
 }
 
 
 
-uint32_t SSerial_put(uint8_t * p_p_instance->tx_byte)
+uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte)
 {
-	err_code = app_fifo_put(&p_instance->tx_fifo, *p_p_instance->tx_byte); //пихаем байт в фифо
+	err_code = app_fifo_put(&p_instance->tx_fifo, *p_tx_byte); //пихаем байт в фифо
 	if(err_code == NRF_SUCCESS)
 	{
 	if(p_instance->tx_byte == 0)
@@ -157,7 +157,7 @@ void rx_read(sserial_t * p_instance)
 						}
 					p_instance->rx_counter = 0;
 					//SEGGER_RTT_printf(0, "%x", p_instance->rx_byte);
-					app_fifo_put(&p_instance->p_instance->p_instance->p_instance->p_instance->rx_fifo, p_instance->rx_byte);
+					app_fifo_put(&p_instance->rx_fifo, p_instance->rx_byte);
 					p_func();
 					p_instance->rx_byte = 0;				
 			}
@@ -198,7 +198,7 @@ void soft_uart_pins_init(sserial_t * p_instance)
 	nrf_gpio_pin_set(p_instance->__tx_pin);
 
 }
-void timer_uart_event_handler(sserial_t * p_instance, nrf_timer_event_t event_type, void* p_context)
+void timer_uart_event_handler(nrf_timer_event_t event_type, sserial_t * p_context)
 	{
     switch (event_type)
     {
@@ -206,18 +206,18 @@ void timer_uart_event_handler(sserial_t * p_instance, nrf_timer_event_t event_ty
 					switch (timer_flag)
 					{
 						case TIMER_ON_BY_RX:
-						p_instance->rx_half_bit_counter++;
-						rx_read(p_instance);
+						p_context->rx_half_bit_counter++;
+						rx_read(p_context);
 					break;
 						case TIMER_ON_BY_TX:
-						p_instance->tx_half_bit_counter++;
-						tx_pin_set(p_instance);
+						p_context->tx_half_bit_counter++;
+						tx_pin_set(p_context);
 					break;
 						case TIMER_ON_TXRX:
-						p_instance->rx_half_bit_counter++;
-						rx_read(p_instance);
-						p_instance->tx_half_bit_counter++;
-						tx_pin_set(p_instance);
+						p_context->rx_half_bit_counter++;
+						rx_read(p_context);
+						p_context->tx_half_bit_counter++;
+						tx_pin_set(p_context);
           break;
 					}
 
@@ -234,7 +234,7 @@ void timer_init(sserial_t * p_instance)
     .mode               = (nrf_timer_mode_t)NRF_TIMER_MODE_TIMER,          
     .bit_width          = (nrf_timer_bit_width_t)NRF_TIMER_BIT_WIDTH_16 ,
     .interrupt_priority = TIMER_DEFAULT_CONFIG_IRQ_PRIORITY,                    
-    .p_context          = NULL     
+    .p_context          = p_instance
 		};
 
 		nrf_drv_timer_init(&UART_TIMER, &timer_cfg, timer_uart_event_handler);

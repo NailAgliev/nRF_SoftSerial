@@ -22,16 +22,9 @@ extern sserial_t my_uart =
 	.rx_counter = 0,
 	.tx_counter = 0,
 	.rx_fifo = 0,
-	.tx_fifo = 0,
-	.(*p_func)(void);
+	.tx_fifo = 0
 };
 
-extern sserial_t uart = 
-{												
-.__tx_pin = 0,		
-.__rx_pin = 0,		
-.timer_tics = 0
-};
 
 uint8_t byte = 0;
 
@@ -39,9 +32,9 @@ uint8_t byte = 0;
 
 void testfunc()
 		{
-			SSerial_get(&byte);
+			SSerial_get(&my_uart, &byte);
 			//SEGGER_RTT_printf(0, "%c", byte);
-			SSerial_put(&byte);
+			SSerial_put(&my_uart, &byte);
 		}
 
 
@@ -54,7 +47,6 @@ int main(void)
     //Configure all leds on board.
     //Configure TIMER_LED for generating simple light effect - leds on board will invert his state one after the other.
 		SoftSerial_init(&my_uart, 12, 18, 9600, 64, 64, &testfunc);
-		SoftSerial_init(&uart, 12, 18, 9600, 64, 64, &testfunc);
 		
 		while(1)
     {

@@ -40,7 +40,6 @@ typedef struct
 	uint8_t tx_counter;
 	app_fifo_t rx_fifo;
 	app_fifo_t tx_fifo;
-	uint32_t (*p_func)();
 } sserial_t;
 
 #define UART_DEFALUT   	\
@@ -67,10 +66,10 @@ void rx_read();
 void soft_uart_pins_init();
 uint32_t tx_put();
 void SoftSerial_init(sserial_t * p_instance, uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, uint32_t (* testfunc)(void));
-uint32_t SSerial_put(uint8_t * p_tx_byte);
-void SSerial_put_string(uint8_t * p_string);
+uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte);
+void SSerial_put_string(sserial_t * p_instance,uint8_t * p_string);
 
-uint32_t SSerial_get(uint8_t *p_byte);
+uint32_t SSerial_get(sserial_t * p_instance, uint8_t *p_byte);
 //void SSerial_tx_send_string();
 
 #endif
