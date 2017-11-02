@@ -65,7 +65,7 @@ uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte)
 	{
 		return NRF_ERROR_NO_MEM;
 	}
-	tx_put();
+	tx_put(p_instance);
 	return err_code;
 }
 uint32_t tx_put(sserial_t	* p_instance)
@@ -130,9 +130,11 @@ void tx_pin_set(sserial_t	* p_instance)
 		if((p_instance->tx_byte & ( 1 << p_instance->tx_counter)) > 0)
 		{	
 			nrf_gpio_pin_set(p_instance->__tx_pin);
+			SEGGER_RTT_printf(0, "1");
 		}
 		else 
 		{
+			SEGGER_RTT_printf(0, "0");
 			nrf_gpio_pin_clear(p_instance->__tx_pin);
 		}
 		p_instance->tx_counter++;
