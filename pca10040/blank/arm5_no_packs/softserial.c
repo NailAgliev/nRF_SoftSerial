@@ -141,6 +141,10 @@ void tx_pin_set(sserial_t	* p_instance)
 
 void rx_read(sserial_t * p_instance)
 {
+	if(p_instance->rx_half_bit_counter < 1)
+	{
+		nrf_drv_gpiote_in_event_disable(p_instance->__rx_pin);
+	}
 	
 	if(p_instance->rx_half_bit_counter > 17)   // получили 8 бит данных
 			{
@@ -176,12 +180,10 @@ void rx_start_bit_handler (sserial_t * p_instance, nrf_drv_gpiote_pin_t pin, nrf
 	if(timer_flag == TIMER_OFF)
 		{
 		nrf_drv_timer_enable(&UART_TIMER);
-		nrf_drv_gpiote_in_event_disable(p_instance->__rx_pin);
 		timer_flag = TIMER_ON_BY_RX;
 		}
 		else if(timer_flag != TIMER_ON_BY_RX) //если таймер запущенн то не включать таймер
 	{
-		nrf_drv_gpiote_in_event_disable(p_instance->__rx_pin);
 		timer_flag = TIMER_ON_TXRX;
 	}
 }
