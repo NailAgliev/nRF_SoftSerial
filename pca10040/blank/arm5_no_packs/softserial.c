@@ -68,6 +68,21 @@ uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte)
 	tx_put(p_instance);
 	return err_code;
 }
+uint32_t SSerial_put_from(sserial_t * p_instance, sserial_t * p_second_instance)
+{
+	uint8_t byte_between = 0;
+	err_code = app_fifo_get(&p_instance->tx_fifo, &byte_between);
+	if(err_code == NRF_ERROR_NOT_FOUND)
+	{
+		return err_code;
+	}
+	err_code = app_fifo_put(&p_second_instance->rx_fifo, byte_between);
+	
+	return err_code;
+}
+
+
+
 uint32_t tx_put(sserial_t	* p_instance)
 {
 	if(timer_flag == TIMER_OFF)

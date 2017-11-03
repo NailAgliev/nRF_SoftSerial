@@ -10,21 +10,22 @@
 
 
 
-static sserial_t my_uart = SSERIAL_DEFALUT;
-
+static sserial_t first_weigher = SSERIAL_DEFALUT;
+static sserial_t second_weigher = SSERIAL_DEFALUT;
+static sserial_t termite = SSERIAL_DEFALUT;
 
 
 uint8_t byte = 0;
 
 void testfunc()
 		{
-			SSerial_get(&my_uart, &byte);
-			SSerial_put(&my_uart, &byte);
+			SSerial_get(&first_weigher, &byte);
+			SSerial_put(&first_weigher, &byte);
 		}
 int main(void)
 {
-		SoftSerial_init(&my_uart, 12, 18, 9600, 64, 64, &testfunc);
-		
+		SoftSerial_init(&first_weigher, 17, 20, 9600, 64, 64, &testfunc);
+		//SoftSerial_init(&second_weigher, 16, 19, 9600, 64, 64, &testfunc);
 		while(1)
     {
 			__WFI();
