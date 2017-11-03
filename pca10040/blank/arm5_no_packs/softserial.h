@@ -40,21 +40,23 @@ typedef struct
 	uint8_t tx_counter;
 	app_fifo_t rx_fifo;
 	app_fifo_t tx_fifo;
+	uint32_t (*p_func)();
 } sserial_t;
 
-#define SSERIAL_DEFALUT      \                 
-{												
-	.__tx_pin = 0,		\
-	.__rx_pin = 0,		\
-	.timer_tics = 0,	\
-	.rx_byte = 0,    \
-	.tx_byte = 0,
-	.rx_half_bit_counter = 0,  \
-	.tx_half_bit_counter = 0,  \
-	.rx_counter = 0,   \
-	.tx_counter = 0,  \
-	.rx_fifo = 0,  \
-	.tx_fifo = 0  \
+
+#define SSERIAL_DEFALUT				\
+{															\
+	.__tx_pin = 0,							\
+	.__rx_pin = 0,							\
+	.timer_tics = 0,						\
+	.rx_byte = 0,    						\
+	.tx_byte = 0,								\
+	.rx_half_bit_counter = 0, 	\
+	.tx_half_bit_counter = 0, 	\
+	.rx_counter = 0,   					\
+	.tx_counter = 0,  					\
+	.rx_fifo = 0,  							\
+	.tx_fifo = 0,  							\
 }
 
 #define UART0_INSTANCE_INDEX 0
@@ -69,10 +71,10 @@ typedef struct
 
 
 
-void timer_init();
-void rx_read();
-void soft_uart_pins_init();
-uint32_t tx_put();
+void timer_init(sserial_t * p_instance);
+void rx_read(sserial_t * p_instance);
+void soft_uart_pins_init(sserial_t * p_instance);
+uint32_t tx_put(sserial_t	* p_instance);
 void SoftSerial_init(sserial_t * p_instance, uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, uint32_t (* testfunc)(void));
 uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte);
 void SSerial_put_string(sserial_t * p_instance,uint8_t * p_string);

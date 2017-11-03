@@ -9,7 +9,7 @@
 
 uint8_t timer_flag = 0;   // состояне флага
 uint32_t remaining_bytes_to_send = 0;    // количество байт которые предстоит отправить (сейчас не используется)
-uint32_t (*p_func)()= 0;
+
 
 
 const nrf_drv_timer_t UART_TIMER = NRF_DRV_TIMER_INSTANCE(0);
@@ -17,7 +17,7 @@ uint32_t err_code = NRF_SUCCESS;
 
 void SoftSerial_init(sserial_t *  p_instance,	uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, uint32_t (*testfunc)())
 {			
-		p_func = testfunc;
+		p_instance->p_func = testfunc;
 		p_instance->__tx_pin = tx_pin;
 		p_instance->__rx_pin = rx_pin;
 		p_instance->timer_tics = (TIMER_FREQ/(baud_rate*2));
@@ -38,7 +38,7 @@ uint32_t SSerial_get(sserial_t * p_instance, uint8_t * p_byte)
 void SSerial_put_string(sserial_t * p_instance, uint8_t * p_string)
 {
 	//SEGGER_RTT_printf(0, "%s", p_string);
-	for (uint8_t c=0; c < (uint8_t)strlen(p_string); c++)
+	for (uint8_t c=0; c < strlen(p_string); c++)
 	{
 		SSerial_put(p_instance, p_string+c);
 	}
@@ -164,7 +164,7 @@ void rx_read(sserial_t * p_instance)
 					p_instance->rx_counter = 0;
 					//SEGGER_RTT_printf(0, "%x", p_instance->rx_byte);
 					app_fifo_put(&p_instance->rx_fifo, p_instance->rx_byte);
-					p_func();
+					p_instance->p_func();
 					p_instance->rx_byte = 0;				
 			}
 	if((p_instance->rx_half_bit_counter >= 3) && ((p_instance->rx_half_bit_counter % 2) == 1)) // заходим по нечетным прерываниям (8 бит данных)

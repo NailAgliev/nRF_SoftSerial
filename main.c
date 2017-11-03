@@ -10,20 +10,8 @@
 
 
 
-extern sserial_t my_uart = 
-{												
-	.__tx_pin = 0,		
-	.__rx_pin = 0,		
-	.timer_tics = 0,
-	.rx_byte = 0,
-	.tx_byte = 0,
-	.rx_half_bit_counter = 0,
-	.tx_half_bit_counter = 0,
-	.rx_counter = 0,
-	.tx_counter = 0,
-	.rx_fifo = 0,
-	.tx_fifo = 0
-};
+static sserial_t my_uart = SSERIAL_DEFALUT;
+
 
 
 uint8_t byte = 0;
