@@ -67,7 +67,7 @@ uint32_t SSerial_put_from(sserial_t * p_instance, sserial_t * p_secin);
 void SSerial_put_string(sserial_t * p_instance,uint8_t * p_string);
 
 uint32_t SSerial_get(sserial_t * p_instance, uint8_t *p_byte);
-uint32_t SSerial_get_string(sserial_t * p_instance, uint8_t *p_byte);
+uint32_t SSerial_get_string(sserial_t * p_instance, uint8_t * p_byte);
 
 //void SSerial_tx_send_string();
 
