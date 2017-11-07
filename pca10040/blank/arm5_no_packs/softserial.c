@@ -76,6 +76,36 @@ uint32_t SSerial_get(sserial_t * p_instance, uint8_t * p_byte)
 	return err_code;
 }
 
+
+
+uint32_t SSerial_get_string(sserial_t * p_instance, uint8_t * p_byte)
+{
+	uint8_t char_between = 0;
+	uint8_t index = 0;
+	uint8_t index1 = 0;
+	memset (p_byte, 0, sizeof(*p_byte));
+	while(char_between != 0x0A)
+	{
+		err_code = app_fifo_peek(&p_instance->rx_fifo, index1, &char_between);
+		if(err_code == NRF_ERROR_NOT_FOUND){
+		break;
+		}
+		index1++;
+	}
+	while(index < index1 && char_between == 0x0A)
+	{
+		err_code = app_fifo_get(&p_instance->rx_fifo, (p_byte + index));
+		index++;
+	}
+	char_between = 0;
+	index = 0;
+	index1 = 0;
+}
+
+
+
+
+
 void SSerial_put_string(sserial_t * p_instance, uint8_t * p_string)
 {
 	//SEGGER_RTT_printf(0, "%s", p_string);
@@ -186,11 +216,11 @@ void tx_pin_set(sserial_t	* p_instance)
 		if((p_instance->tx_byte & ( 1 << p_instance->tx_counter)) > 0)
 		{	
 			nrf_gpio_pin_set(p_instance->__tx_pin);
-			SEGGER_RTT_printf(0, "1");
+			//SEGGER_RTT_printf(0, "1");
 		}
 		else 
 		{
-			SEGGER_RTT_printf(0, "0");
+			//SEGGER_RTT_printf(0, "0");
 			nrf_gpio_pin_clear(p_instance->__tx_pin);
 		}
 		p_instance->tx_counter++;
@@ -217,7 +247,7 @@ void rx_read(sserial_t * p_instance)
 							timer_flag = TIMER_ON_BY_TX;
 						}
 					p_instance->rx_counter = 0;
-					SEGGER_RTT_printf(0, "%c", p_instance->rx_byte);
+					//SEGGER_RTT_printf(0, "%c", p_instance->rx_byte);
 					app_fifo_put(&p_instance->rx_fifo, p_instance->rx_byte);
 					p_instance->p_func();
 					p_instance->rx_byte = 0;				
