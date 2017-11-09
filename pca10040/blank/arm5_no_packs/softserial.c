@@ -83,7 +83,7 @@ uint32_t SSerial_get_string(sserial_t * p_instance, uint8_t * p_byte)
 	uint8_t char_between = 0;
 	uint8_t index = 0;
 	uint8_t index1 = 0;
-	memset(p_byte, 0, (sizeof(*p_byte)));
+	memset(p_byte, 0, p_instance->rx_fifo.buf_size_mask+1);
 	while(char_between != 0x0A)
 	{
 		err_code = app_fifo_peek(&p_instance->rx_fifo, index1, &char_between);
