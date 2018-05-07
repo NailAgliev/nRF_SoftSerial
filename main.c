@@ -24,10 +24,8 @@ uint8_t n = 0;
 
 void testfunc()
 		{
-			SSerial_get(&sim800, &byte);
-			SSerial_put(&termite, &byte);
-			SSerial_put(&sim800, &byte);
 			SSerial_get(&termite, &byte);
+			SSerial_put(&termite, &byte);
 			//SSerial_get_string(&arduino, test_string);
 //			n = sizeof(test_string);
 //			SEGGER_RTT_printf(0, "%d", n);
@@ -35,8 +33,7 @@ void testfunc()
 		}
 int main(void)
 {
-		SoftSerial_init(&termite, 17, 20, 9600, 64, 64, &testfunc);
-		SoftSerial_init(&sim800, 17, 18, 9600, 64, 64, &testfunc);
+		SoftSerial_init(&termite,16, 18, 9600, 64, 64, &testfunc);
 		while(1)
     {
 			__WFI();
