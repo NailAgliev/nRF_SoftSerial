@@ -23,10 +23,6 @@
 
 
 
-
-#define TEST_MACRO(name1, name2) name1##name2
-#define UART_INIT(index) CONCAT_2(tx_byte, index);
-
 typedef struct
 {
 	uint8_t __tx_pin;
@@ -40,34 +36,27 @@ typedef struct
 	uint8_t tx_counter;
 	app_fifo_t rx_fifo;
 	app_fifo_t tx_fifo;
-	uint32_t (*p_func)();
+	void (*p_func)();
 } sserial_t;
 
 
 #define UART0_INSTANCE_INDEX 0
-#define UART1_INSTANCE_INDEX UART0_INSTANCE_INDEX
-#define UART2_INSTANCE_INDEX UART1_INSTANCE_INDEX
-#define UART3_INSTANCE_INDEX UART2_INSTANCE_INDEX
-#define UART4_INSTANCE_INDEX UART3_INSTANCE_INDEX
-#define UART5_INSTANCE_INDEX UART4_INSTANCE_INDEX
-#define UART6_INSTANCE_INDEX UART5_INSTANCE_INDEX
 
 
 
 
 
-void timer_init(sserial_t * p_instance, sserial_t * p_instance1, sserial_t * p_instance2, sserial_t * p_instance3);
+
 void rx_read(sserial_t * p_instance);
-void soft_uart_pins_init(sserial_t * p_instance, sserial_t * p_instance1, sserial_t * p_instance2, sserial_t * p_instance3);
 uint32_t tx_put(sserial_t	* p_instance);
 
-void SoftSerial_init(sserial_t * p_instance, uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, uint32_t (* testfunc)(void));
+void SoftSerial_init(sserial_t * p_instance, uint8_t tx_pin, uint8_t rx_pin, uint16_t baud_rate, uint8_t rx_bufer_size, uint8_t tx_bufer_size, void (* testfunc)(void));
 uint32_t SSerial_put(sserial_t * p_instance, uint8_t * p_tx_byte);
 uint32_t SSerial_put_from(sserial_t * p_instance, sserial_t * p_secin);
-void SSerial_put_string(sserial_t * p_instance,uint8_t * p_string);
+void SSerial_put_string(sserial_t * p_instance,char * p_string);
 
 uint32_t SSerial_get(sserial_t * p_instance, uint8_t *p_byte);
-uint32_t SSerial_get_string(sserial_t * p_instance, uint8_t * p_byte);
+void SSerial_get_string(sserial_t * p_instance, uint8_t * p_byte);
 
 //void SSerial_tx_send_string();
 
